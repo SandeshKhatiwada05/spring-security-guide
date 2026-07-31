@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="A free, interactive zero-to-hero guide to Spring Security 6. Learn authentication, authorization, the filter chain, and configuration by doing." />
+<title>Spring Security 6 Guide — Zero to Confident</title>
+<script>document.documentElement.classList.add("js");</script>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- ============ 1. HEADER ============ -->
+<header class="site-header" id="site-header">
+  <a class="brand" href="#top">Spring Security 6 Guide</a>
+</header>
+
+<!-- ============ TABLE OF CONTENTS SIDEBAR ============ -->
+<button class="toc-toggle" id="toc-toggle" type="button" aria-expanded="true" aria-controls="toc-sidebar" aria-label="Expand or collapse the table of contents sidebar">
+  <span class="toc-toggle-icon" aria-hidden="true"><span></span></span>
+</button>
+<aside class="toc-sidebar" id="toc-sidebar" aria-label="Table of contents">
+  <p class="toc-label">Contents</p>
+  <nav aria-label="Sections on this page">
+    <ul class="toc-list" id="toc-list"></ul>
+  </nav>
+</aside>
+<div class="toc-backdrop" id="toc-backdrop"></div>
+
+<main id="main">
+
+  <!-- ============ 2. HERO ============ -->
+  <section class="hero" id="top" aria-labelledby="hero-title">
+    <div class="hero-blob" aria-hidden="true"></div>
+    <div class="container hero-content">
+      <p class="eyebrow" data-animate>Zero to hero · no prior security knowledge needed</p>
+      <h1 class="hero-title" id="hero-title" data-animate>Master Spring Security 6</h1>
+      <p class="hero-subtitle" data-animate>
+        A complete, hands-on walkthrough for beginners: what security actually does,
+        how the filter chain works, and how to write real Spring Security 6 configuration
+        with confidence. Learn the why, then see the how.
+      </p>
+      <div class="hero-actions" data-animate>
+        <a class="btn btn-primary" href="#what">Begin Tutorial</a>
+        <a class="btn btn-outline" href="#cheatsheet">View Cheat Sheet</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. WHAT IS SPRING SECURITY ============ -->
+  <section class="block-section" id="what" aria-labelledby="what-title">
+    <div class="container two-col">
+      <div data-animate>
+        <p class="eyebrow">Chapter 1 · The mental model</p>
+        <h2 class="section-title" id="what-title">What is Spring Security?</h2>
+        <p class="section-lede">
+          Meet the bouncer. Imagine a nightclub. It doesn't matter how good the DJ is —
+          nobody gets in without walking past the person at the door. Spring Security is
+          that person for your web application. Before any of your code ever runs, it
+          decides who is allowed in and how far they can go.
+        </p>
+        <div class="bouncer-def">
+          <article>
+            <div class="def-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/></svg>
+            </div>
+            <div>
+              <h3>Authentication — "Who are you?"</h3>
+              <p>The bouncer checks your ID at the door. Spring checks your credentials:
+              username, password, token, or Google account. If you can't prove who you are,
+              you're not getting in.</p>
+            </div>
+          </article>
+          <article>
+            <div class="def-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            </div>
+            <div>
+              <h3>Authorization — "What can you do?"</h3>
+              <p>Once inside, your wristband decides which rooms you may enter. Spring checks
+              your roles and permissions against the URL you requested: the VIP floor needs
+              <code class="inline">ADMIN</code>, the main room just needs to be logged in.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div data-animate>
+        <div class="checkpoint">
+          <div class="cp-flow" role="img" aria-label="Diagram: a request moves from the client, through the security filter chain, then reaches the controller">
+            <div class="cp-node">
+              <span class="cp-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+              </span>
+              <strong>Client</strong>
+              <small>GET /account</small>
+            </div>
+            <div class="cp-node cp-bouncer">
+              <span class="cp-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+              </span>
+              <strong>Bouncer</strong>
+              <small>Filter chain</small>
+              <div class="cp-tags">
+                <span class="cp-tag">Who are you?</span>
+                <span class="cp-tag">What can you do?</span>
+              </div>
+            </div>
+            <div class="cp-node">
+              <span class="cp-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>
+              </span>
+              <strong>Controller</strong>
+              <small>@RestController</small>
+            </div>
+          </div>
+          <div class="info-card">
+            <strong>Key insight</strong>
+            <p>Spring Security is just a chain of filters. Every request is intercepted before
+            reaching your code. Your controller only ever sees requests that survived the bouncer.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. THE TWO CORE JOBS ============ -->
+  <section class="block-section" id="jobs" aria-labelledby="jobs-title">
+    <div class="container">
+      <p class="eyebrow" data-animate>Chapter 2 · The two core jobs</p>
+      <h2 class="section-title" id="jobs-title" data-animate>The Two Core Jobs</h2>
+      <p class="section-lede" data-animate>
+        Everything Spring Security does falls into one of two buckets: proving who you are,
+        and deciding what you may do. Get these two straight and the whole framework stops
+        feeling magical.
+      </p>
+
+      <div class="job-grid">
+        <article class="job-card" data-animate>
+          <div class="job-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <h3>Authentication</h3>
+          <p>
+            Proving identity. Spring collects a username and password (or a JWT, or a Google
+            token), looks the user up, and verifies the password hash. On success it stores
+            the proven identity in the <code class="inline">SecurityContext</code> so every
+            later filter and controller knows who you are. To authenticate against a database,
+            you implement one method:
+          </p>
+          <pre><code class="lang-java">@Bean
+UserDetailsService userDetailsService() {
+    // Spring calls this on every login attempt,
+    // asking "who is this username?"
+    return username -&gt; User.withUsername(username)
+        .password(passwordEncoder().encode("secret"))
+        .roles("USER")
+        .build();
+}</code></pre>
+        </article>
+
+        <article class="job-card" data-animate>
+          <div class="job-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1"/></svg>
+          </div>
+          <h3>Authorization</h3>
+          <p>
+            Deciding access. Once identity is proven, Spring walks through the rules you wrote
+            in <code class="inline">authorizeHttpRequests</code> and matches the requested URL
+            against each pattern. The first match wins. If no rule matches, the default is
+            usually "deny". Roles come from the user's authority list:
+          </p>
+          <pre><code class="lang-java">http.authorizeHttpRequests(auth -&gt; auth
+    .requestMatchers("/admin/**").hasRole("ADMIN")
+    .anyRequest().authenticated());</code></pre>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5. THE FILTER CHAIN ============ -->
+  <section class="block-section" id="chain" aria-labelledby="chain-title">
+    <div class="container">
+      <p class="eyebrow" data-animate>Chapter 3 · The centerpiece</p>
+      <h2 class="section-title" id="chain-title" data-animate>The Filter Chain, Step by Step</h2>
+      <p class="section-lede" data-animate>
+        Think of the security filters as a conveyor belt. Every request is loaded onto the belt
+        and carried through a fixed series of checks. Tap each step to follow one request from
+        the browser all the way to your controller.
+      </p>
+
+      <div class="stepper" data-animate>
+        <ol class="step-list" id="step-list" aria-label="Filter chain steps">
+          <li>
+            <button class="step-btn is-active" data-target="step-panel-1" aria-controls="step-panel-1" aria-expanded="true">
+              <span class="step-num">1</span>
+              <span><strong>The request arrives</strong><small>browser sends an HTTP request</small></span>
+            </button>
+          </li>
+          <li>
+            <button class="step-btn" data-target="step-panel-2" aria-controls="step-panel-2" aria-expanded="false">
+              <span class="step-num">2</span>
+              <span><strong>DelegatingFilterProxy</strong><small>the front door of Spring</small></span>
+            </button>
+          </li>
+          <li>
+            <button class="step-btn" data-target="step-panel-3" aria-controls="step-panel-3" aria-expanded="false">
+              <span class="step-num">3</span>
+              <span><strong>Authentication filters</strong><small>"who are you?"</small></span>
+            </button>
+          </li>
+          <li>
+            <button class="step-btn" data-target="step-panel-4" aria-controls="step-panel-4" aria-expanded="false">
+              <span class="step-num">4</span>
+              <span><strong>Authorization filters</strong><small>"what can you do?"</small></span>
+            </button>
+          </li>
+          <li>
+            <button class="step-btn" data-target="step-panel-5" aria-controls="step-panel-5" aria-expanded="false">
+              <span class="step-num">5</span>
+              <span><strong>The controller</strong><small>your code finally runs</small></span>
+            </button>
+          </li>
+        </ol>
+
+        <div class="step-panels">
+          <div class="step-panel is-open" id="step-panel-1" role="group" aria-label="Step 1">
+            <h3>The request arrives</h3>
+            <p>
+              Your browser sends a plain HTTP request — a URL, headers, maybe a cookie or a
+              token. Nothing security-related has happened yet. The request is just bytes on
+              the wire, heading toward your server.
+            </p>
+            <pre><code class="lang-plain">GET /user/dashboard HTTP/1.1
+Host: myapp.example.com
+Cookie: JSESSIONID=4A9C2E1B8F</code></pre>
+          </div>
+
+          <div class="step-panel" id="step-panel-2" role="group" aria-label="Step 2">
+            <h3>DelegatingFilterProxy — the front door</h3>
+            <p>
+              Servlet containers know nothing about Spring. <code class="inline">DelegatingFilterProxy</code>
+              is the bridge: a plain servlet filter that looks up your
+              <code class="inline">SecurityFilterChain</code> bean and hands the request to it.
+              This is the exact moment your request officially enters the security world.
+            </p>
+            <pre><code class="lang-java">// Boot registers this filter for you — no code needed.
+// It finds your SecurityFilterChain bean and calls doFilter().
+public class DelegatingFilterProxy extends GenericFilterBean {
+    // delegates to the SecurityFilterChain in the Spring context
+}</code></pre>
+          </div>
+
+          <div class="step-panel" id="step-panel-3" role="group" aria-label="Step 3">
+            <h3>Authentication filters — "Who are you?"</h3>
+            <p>
+              Spring runs a series of filters, each built for one authentication mechanism.
+              The one that matches picks your credentials and asks the
+              <code class="inline">AuthenticationManager</code> to verify them. If they fail,
+              the request dies here with a <code class="inline">401</code> — before any of
+              your code runs.
+            </p>
+            <pre><code class="lang-java">// The filter that handles form-login credentials
+Authentication auth = authenticationManager.authenticate(
+    new UsernamePasswordAuthenticationToken(username, password));
+
+// success -&gt; remember the proven identity for this request
+SecurityContextHolder.getContext().setAuthentication(auth);</code></pre>
+          </div>
+
+          <div class="step-panel" id="step-panel-4" role="group" aria-label="Step 4">
+            <h3>Authorization — "And what can you do?"</h3>
+            <p>
+              Now Spring knows who you are, it checks what you're allowed to do. Using the rules
+              you wrote in <code class="inline">authorizeHttpRequests</code>, it compares the URL
+              against your authorities. No rule matches? The default applies — which for an
+              unauthenticated request is a <code class="inline">403</code> or a redirect to login.
+            </p>
+            <pre><code class="lang-java">http.authorizeHttpRequests(auth -&gt; auth
+    .requestMatchers("/admin/**").hasRole("ADMIN")
+    .requestMatchers("/user/**").hasRole("USER")
+    .anyRequest().authenticated());</code></pre>
+          </div>
+
+          <div class="step-panel" id="step-panel-5" role="group" aria-label="Step 5">
+            <h3>The controller — welcome in</h3>
+            <p>
+              Only after every filter passes does your code run. By the time your
+              <code class="inline">@GetMapping</code> method executes, the current user is
+              already stored in the <code class="inline">SecurityContext</code>, ready to read
+              via <code class="inline">@AuthenticationPrincipal</code>.
+            </p>
+            <pre><code class="lang-java">@RestController
+public class DashboardController {
+
+    @GetMapping("/user/dashboard")
+    public String dashboard(@AuthenticationPrincipal User user) {
+        return "Welcome back, " + user.getUsername();
+    }
+}</code></pre>
+          </div>
+
+          <div class="step-nav">
+            <button class="btn btn-outline btn-small" id="step-prev" type="button">Previous step</button>
+            <button class="btn btn-primary btn-small" id="step-next" type="button">Next step</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Try It mini demo -->
+      <div class="tryit" data-animate>
+        <h3 class="tryit-title">Try It — simulate the bouncer</h3>
+        <p class="tryit-intro">
+          Pretend you are the user <code class="inline">user</code> with role
+          <code class="inline">ROLE_USER</code>. Type a URL path and watch the filter chain
+          decide: pass, or block.
+        </p>
+        <div class="tryit-row">
+          <label class="visually-hidden" for="path-input">Enter a URL path</label>
+          <input class="tryit-input" id="path-input" type="text" placeholder="/admin/dashboard" value="/user/settings" />
+          <button class="btn btn-primary" id="path-check" type="button">Check access</button>
+        </div>
+        <div class="tryit-chips" aria-label="Example paths">
+          <button class="chip" type="button">/public/help</button>
+          <button class="chip" type="button">/login</button>
+          <button class="chip" type="button">/user/settings</button>
+          <button class="chip" type="button">/account</button>
+          <button class="chip" type="button">/admin/dashboard</button>
+          <button class="chip" type="button">/admin/users/42</button>
+        </div>
+        <div class="tryit-result" id="tryit-result" role="status" aria-live="polite"></div>
+        <p class="tryit-rule">Hardcoded rule for this demo: /public/** and /login are permitAll() · /admin/** needs ROLE_ADMIN · everything else requires an authenticated user.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6. THE 5 BUILDING BLOCKS ============ -->
+  <section class="block-section" id="blocks" aria-labelledby="blocks-title">
+    <div class="container">
+      <p class="eyebrow" data-animate>Chapter 4 · Component explorer</p>
+      <h2 class="section-title" id="blocks-title" data-animate>The 5 Building Blocks</h2>
+      <p class="section-lede" data-animate>
+        Almost every Spring Security problem comes down to these five components. Click a card
+        to see what it does, when Spring calls it, working code, and the mistake people most
+        often make.
+      </p>
+
+      <div class="block-grid" data-animate role="tablist" aria-label="Building blocks">
+        <button class="block-btn is-active" data-target="block-panel-1" role="tab" aria-selected="true" aria-controls="block-panel-1">
+          <strong>SecurityFilterChain</strong>
+          <small>The configured pipeline your requests traverse</small>
+        </button>
+        <button class="block-btn" data-target="block-panel-2" role="tab" aria-selected="false" aria-controls="block-panel-2">
+          <strong>UserDetailsService</strong>
+          <small>Your bridge to the user database</small>
+        </button>
+        <button class="block-btn" data-target="block-panel-3" role="tab" aria-selected="false" aria-controls="block-panel-3">
+          <strong>PasswordEncoder</strong>
+          <small>Hashes and verifies passwords</small>
+        </button>
+        <button class="block-btn" data-target="block-panel-4" role="tab" aria-selected="false" aria-controls="block-panel-4">
+          <strong>AuthenticationManager</strong>
+          <small>The conductor of login attempts</small>
+        </button>
+        <button class="block-btn" data-target="block-panel-5" role="tab" aria-selected="false" aria-controls="block-panel-5">
+          <strong>SecurityContextHolder</strong>
+          <small>Stores "who is logged in" right now</small>
+        </button>
+      </div>
+
+      <div id="block-panel-1" class="block-panel is-open" role="tabpanel" aria-label="SecurityFilterChain">
+        <div class="bp-grid">
+          <div>
+            <h4>What it does in plain English</h4>
+            <p>The finished, ordered list of checks every request walks through. You configure
+            it with <code class="inline">HttpSecurity</code>; Spring hands the result back as a
+            bean. Everything you will ever write in Spring Security config is really assembling
+            this one object.</p>
+          </div>
+          <div>
+            <h4>When Spring calls it</h4>
+            <p>Built once at startup. From then on, every matching request flows through it for
+            the lifetime of the app.</p>
+          </div>
+          <div class="bp-code">
+            <h4>Copy-paste ready</h4>
+            <pre><code class="lang-java">@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(auth -&gt; auth
+                .requestMatchers("/public/**").permitAll()
+                .anyRequest().authenticated())
+            .formLogin(Customizer.withDefaults());
+        return http.build();
+    }
+}</code></pre>
+          </div>
+          <div class="bp-mistake">
+            <strong>Common mistake:</strong>
+            <p>Defining two SecurityFilterChain beans whose URL patterns overlap. Order matters:
+            the first bean whose pattern matches wins, so the most specific matchers must live in
+            the first chain, and a chain without matchers must be last.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="block-panel-2" class="block-panel" role="tabpanel" aria-label="UserDetailsService">
+        <div class="bp-grid">
+          <div>
+            <h4>What it does in plain English</h4>
+            <p>Your bridge between Spring and your user table. Spring asks it exactly one
+            question: "given this username, give me the UserDetails." Whatever it returns —
+            password hash, roles, account status — is everything security knows about that user.</p>
+          </div>
+          <div>
+            <h4>When Spring calls it</h4>
+            <p>During authentication, right after a filter collects the username. Also during
+            remember-me and token refresh lookups.</p>
+          </div>
+          <div class="bp-code">
+            <h4>Copy-paste ready</h4>
+            <pre><code class="lang-java">@Service
+public class AppUserDetailsService implements UserDetailsService {
+
+    private final UserRepository users;
+
+    public AppUserDetailsService(UserRepository users) {
+        this.users = users;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username)
+            throws UsernameNotFoundException {
+        // Return null or throw: Spring treats both as bad credentials.
+        return users.findByUsername(username)
+                .map(MyUser::new) // your entity -&gt; UserDetails adapter
+                .orElseThrow(() -&gt; new UsernameNotFoundException(
+                        "No user named " + username));
+    }
+}</code></pre>
+          </div>
+          <div class="bp-mistake">
+            <strong>Common mistake:</strong>
+            <p>Returning a UserDetails with an empty authority list. Authentication will succeed,
+            but every authorization check fails afterwards — a confusing wall of 403s.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="block-panel-3" class="block-panel" role="tabpanel" aria-label="PasswordEncoder">
+        <div class="bp-grid">
+          <div>
+            <h4>What it does in plain English</h4>
+            <p>Hashes passwords so they are never stored in plain text, and verifies a typed
+            password against a stored hash at login. The hash itself carries its encoder id
+            (like <code class="inline">{bcrypt}</code>), so hashes stay portable between encoders.</p>
+          </div>
+          <div>
+            <h4>When Spring calls it</h4>
+            <p><code class="inline">encode()</code> on registration and password changes.
+            <code class="inline">matches()</code> on every login.</p>
+          </div>
+          <div class="bp-code">
+            <h4>Copy-paste ready</h4>
+            <pre><code class="lang-java">@Bean
+public PasswordEncoder passwordEncoder() {
+    // Strength 12 makes brute-force painfully slow (one-time cost).
+    return new BCryptPasswordEncoder(12);
+}
+
+// at registration:
+String hash = passwordEncoder().encode(rawPassword);
+
+// at login, Spring calls this for you:
+boolean ok = passwordEncoder().matches(rawPassword, storedHash);</code></pre>
+          </div>
+          <div class="bp-mistake">
+            <strong>Common mistake:</strong>
+            <p>Defining no PasswordEncoder bean. Spring then requires stored passwords to carry
+            a <code class="inline">{noop}</code> prefix — which literally means "store and compare
+            in plain text." Never ship that.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="block-panel-4" class="block-panel" role="tabpanel" aria-label="AuthenticationManager">
+        <div class="bp-grid">
+          <div>
+            <h4>What it does in plain English</h4>
+            <p>The conductor. It holds a list of AuthenticationProvider objects and tries each one
+            until an authentication succeeds — or gives up and throws. Filters treat it as a black
+            box that answers one question: are these credentials real?</p>
+          </div>
+          <div>
+            <h4>When Spring calls it</h4>
+            <p>Every time a login attempt needs verifying — used by the username/password filter,
+            the JWT filter, and the OAuth2 filter alike.</p>
+          </div>
+          <div class="bp-code">
+            <h4>Copy-paste ready</h4>
+            <pre><code class="lang-java">@Bean
+public AuthenticationManager authenticationManager(
+        AuthenticationConfiguration configuration) throws Exception {
+    // Spring wires the default providers for you.
+    return configuration.getAuthenticationManager();
+}</code></pre>
+          </div>
+          <div class="bp-mistake">
+            <strong>Common mistake:</strong>
+            <p>Building it by hand with a bare DaoAuthenticationProvider, then wondering why your
+            UserDetailsService is never consulted. Use AuthenticationConfiguration unless you
+            genuinely need custom providers.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="block-panel-5" class="block-panel" role="tabpanel" aria-label="SecurityContextHolder">
+        <div class="bp-grid">
+          <div>
+            <h4>What it does in plain English</h4>
+            <p>A storage box holding the Authentication of the current request. Each thread keeps
+            its own copy, so you can read "who is logged in" anywhere without passing the user
+            around as a parameter.</p>
+          </div>
+          <div>
+            <h4>When Spring calls it</h4>
+            <p>Filled right after a successful authentication, and cleared after the request
+            finishes. You read it in controllers, services, and templates.</p>
+          </div>
+          <div class="bp-code">
+            <h4>Copy-paste ready</h4>
+            <pre><code class="lang-java">Authentication auth = SecurityContextHolder.getContext()
+        .getAuthentication();
+
+String name = auth.getName();
+for (GrantedAuthority authority : auth.getAuthorities()) {
+    // e.g. "ROLE_ADMIN"
+    System.out.println(authority.getAuthority());
+}</code></pre>
+          </div>
+          <div class="bp-mistake">
+            <strong>Common mistake:</strong>
+            <p>Reading the context before authentication has run (for example in a filter that runs
+            earlier than the security chain), or stashing non-serializable objects inside it.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7. COMPLETE WORKING EXAMPLE ============ -->
+  <section class="block-section" id="example" aria-labelledby="example-title">
+    <div class="container">
+      <p class="eyebrow" data-animate>Chapter 5 · Put it together</p>
+      <h2 class="section-title" id="example-title" data-animate>A Complete, Runnable Example</h2>
+      <p class="section-lede" data-animate>
+        The full <code class="inline">SecurityConfig.java</code> below is valid Spring Security 6
+        using the lambda DSL. It secures some paths, leaves others public, enables form login with
+        a custom page, and registers two in-memory users with BCrypt-hashed passwords. The numbered
+        callouts after the code explain each piece.
+      </p>
+
+      <pre data-animate><code class="lang-java">package com.example.demo;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    // (1) This bean IS your security setup, top to bottom.
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests(auth -&gt; auth
+                .requestMatchers("/public/**", "/login", "/error").permitAll() // (2)
+                .requestMatchers("/admin/**").hasRole("ADMIN")                 // (3)
+                .requestMatchers("/user/**").hasRole("USER")                   // (3)
+                .anyRequest().authenticated())                                 // (4)
+            .formLogin(form -&gt; form
+                .loginPage("/login")                                           // (5)
+                .defaultSuccessUrl("/user/dashboard", true)
+                .permitAll())
+            .logout(logout -&gt; logout.logoutSuccessUrl("/login?logout"));
+
+        return http.build();
+    }
+
+    // (6) Demo users, hashed with BCrypt — never {noop}.
+    @Bean
+    public UserDetailsService users(PasswordEncoder encoder) {
+        UserDetails admin = User.withUsername("admin")
+                .password(encoder.encode("admin123"))
+                .roles("ADMIN")
+                .build();
+
+        UserDetails user = User.withUsername("user")
+                .password(encoder.encode("user123"))
+                .roles("USER")
+                .build();
+
+        return new InMemoryUserDetailsManager(admin, user);
+    }
+
+    // (7) One encoder for the whole app.
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}</code></pre>
+
+      <div class="callout-list" data-animate>
+        <div class="callout">
+          <span class="callout-num" aria-hidden="true"></span>
+          <p><strong>@EnableWebSecurity</strong> turns on Spring Security's configuration support.
+          You will see this on every security config class.</p>
+        </div>
+        <div class="callout">
+          <span class="callout-num" aria-hidden="true"></span>
+          <p><strong>filterChain(HttpSecurity http)</strong> is where all the rules live. The method
+          returns a <code class="inline">SecurityFilterChain</code> bean that Spring uses as the
+          blueprint for the filter chain. Nothing runs yet — this is just the plan.</p>
+        </div>
+        <div class="callout">
+          <span class="callout-num" aria-hidden="true"></span>
+          <p><strong>The public paths.</strong> <code class="inline">/public/**</code>,
+          <code class="inline">/login</code>, and <code class="inline">/error</code> are explicitly
+          marked <code class="inline">permitAll()</code> — no authentication required. Everything you
+          forget to list here is locked down by the next rule.</p>
+        </div>
+        <div class="callout">
+          <span class="callout-num" aria-hidden="true"></span>
+          <p><strong>Role-gated neighborhoods.</strong> <code class="inline">/admin/**</code> demands
+          the <code class="inline">ADMIN</code> role; <code class="inline">/user/**</code> demands
+          <code class="inline">USER</code>. An authenticated user with the wrong role gets a
+          <code class="inline">403</code>.</p>
+        </div>
+        <div class="callout">
+          <span class="callout-num" aria-hidden="true"></span>
+          <p><strong>anyRequest().authenticated()</strong> is the safety net: any URL not matched
+          above still requires a logged-in user. This "default-deny" stance is what makes the
+          config safe.</p>
+        </div>
+        <div class="callout">
+          <span class="callout-num" aria-hidden="true"></span>
+          <p><strong>Form login</strong> enables the standard login form, points it at your custom
+          page (<code class="inline">/login</code>), and sends successful logins to the dashboard.
+          Logout returns users to the login page.</p>
+        </div>
+        <div class="callout">
+          <span class="callout-num" aria-hidden="true"></span>
+          <p><strong>In-memory users</strong> let you test immediately. The passwords are encoded
+          with BCrypt at startup — the plain values you type never live in memory as plain text.
+          Swap this bean for a database-backed service in a real app.</p>
+        </div>
+      </div>
+
+      <h3 class="section-title" data-animate style="font-size: clamp(1.4rem, 2.6vw, 1.9rem); margin-top: 3rem;">The one dependency</h3>
+      <p class="section-lede" data-animate>
+        Add this to <code class="inline">pom.xml</code>. The Spring Boot parent manages the version,
+        so no version tag is needed. Once it is on the classpath, Spring Security auto-configures
+        itself with a default login form and generated password — then your
+        <code class="inline">SecurityConfig</code> takes over.
+      </p>
+      <pre data-animate><code class="lang-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+    </div>
+  </section>
+
+  <!-- ============ 8. COMMON BEGINNER MISTAKES ============ -->
+  <section class="block-section" id="mistakes" aria-labelledby="mistakes-title">
+    <div class="container">
+      <p class="eyebrow" data-animate>Chapter 6 · Pitfalls</p>
+      <h2 class="section-title" id="mistakes-title" data-animate>Common Beginner Mistakes</h2>
+      <p class="section-lede" data-animate>
+        Every one of these has cost someone an afternoon. They all have the same shape: the app
+        runs, but something quietly fails. Knowing them in advance saves the debugging.
+      </p>
+
+      <div class="mistake-grid">
+        <article class="mistake-card" data-animate>
+          <h3>Missing PasswordEncoder bean</h3>
+          <p>You registered users with <code class="inline">.password("plain123")</code>. Without an
+          encoder bean, Spring only understands <code class="inline">{noop}</code>-prefixed values,
+          so the app runs — but passwords are stored and compared in plain text.</p>
+          <h4>Why it happens</h4>
+          <p>Spring's default behavior kicks in when you never define an encoder, and "it worked" in
+          a tutorial because the tutorial used <code class="inline">{noop}</code> too.</p>
+          <h4>The fix</h4>
+          <pre><code class="lang-java">@Bean
+public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+}
+// then encode real passwords:
+// .password(passwordEncoder().encode("plain123"))</code></pre>
+        </article>
+
+        <article class="mistake-card" data-animate>
+          <h3>hasRole vs hasAuthority confusion</h3>
+          <p><code class="inline">hasAuthority("ADMIN")</code> checks the exact string
+          <code class="inline">"ADMIN"</code>, while <code class="inline">hasRole("ADMIN")</code>
+          first prepends <code class="inline">ROLE_</code> and checks
+          <code class="inline">"ROLE_ADMIN"</code>. Mixing them up silently locks users out.</p>
+          <h4>Why it happens</h4>
+          <p>The two methods look interchangeable, and many older examples switch between them
+          without explanation.</p>
+          <h4>The fix</h4>
+          <pre><code class="lang-java">// when the authority is stored as ROLE_ADMIN:
+.requestMatchers("/admin/**").hasRole("ADMIN"); // prepends ROLE_
+
+// is the same as:
+.requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN");</code></pre>
+        </article>
+
+        <article class="mistake-card" data-animate>
+          <h3>Disabling CSRF blindly for REST</h3>
+          <p>Copy-pasting <code class="inline">.csrf(csrf -&gt; csrf.disable())</code> "to make it
+          work" leaves cookie-based apps open to cross-site request forgery. A browser can be
+          tricked into sending your cookies to your own API.</p>
+          <h4>Why it happens</h4>
+          <p>A JWT tutorial said "turn CSRF off," and the same line landed in a session-based app.</p>
+          <h4>The fix</h4>
+          <pre><code class="lang-java">// stateless REST API only (no cookies) — acceptable:
+http.csrf(csrf -&gt; csrf.disable());
+
+// cookie/session web app — keep CSRF on (the default).</code></pre>
+        </article>
+
+        <article class="mistake-card" data-animate>
+          <h3>Forgetting the ROLE_ prefix</h3>
+          <p>When using <code class="inline">hasAuthority</code> you must include the full
+          authority string. If your user has role <code class="inline">ROLE_ADMIN</code> and you
+          check <code class="inline">hasAuthority("ADMIN")</code>, it never matches — even though
+          the login succeeded.</p>
+          <h4>Why it happens</h4>
+          <p>The prefix is invisible in logs and typical debugging output, so it is easy to miss.</p>
+          <h4>The fix</h4>
+          <pre><code class="lang-java">.requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN");
+// or use hasRole("ADMIN") — the prefix is added for you</code></pre>
+        </article>
+
+        <article class="mistake-card" data-animate>
+          <h3>403 vs 401 confusion</h3>
+          <p>They look similar but mean different things. <code class="inline">401</code> means
+          "you are not authenticated at all." <code class="inline">403</code> means "we know who you
+          are, but you lack permission." Beginners debug a 403 by trying to log in "harder."</p>
+          <h4>Why it happens</h4>
+          <p>Both responses look identical in a browser and are lumped together in casual speech as
+          "access denied."</p>
+          <h4>The fix</h4>
+          <pre><code class="lang-java">// 401 -&gt; not authenticated. Show the login page / send a token.
+// 403 -&gt; authenticated but not allowed. Fix the roles or rules.</code></pre>
+        </article>
+
+        <article class="mistake-card" data-animate>
+          <h3>UserDetails with no authorities</h3>
+          <p>If <code class="inline">loadUserByUsername</code> builds a user without authorities,
+          authentication succeeds but every authorization check fails — everything returns 403.</p>
+          <h4>Why it happens</h4>
+          <p>You mapped the username and password hash but forgot to map the role column.</p>
+          <h4>The fix</h4>
+          <pre><code class="lang-java">// always attach authorities from your entity:
+return new User(entity.getUsername(), entity.getPassword(),
+    List.of(new SimpleGrantedAuthority(entity.getRole())));</code></pre>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 9. DECISION TABLE ============ -->
+  <section class="block-section" id="decisions" aria-labelledby="decisions-title">
+    <div class="container">
+      <p class="eyebrow" data-animate>Chapter 7 · Choose your approach</p>
+      <h2 class="section-title" id="decisions-title" data-animate>When to Use What</h2>
+      <p class="section-lede" data-animate>
+        Spring Security offers several authentication styles because apps are built differently.
+        Start from your architecture, not from a favorite library.
+      </p>
+      <div class="table-wrap" data-animate>
+        <table>
+          <caption class="visually-hidden">Recommended Spring Security approach for common application scenarios</caption>
+          <thead>
+            <tr>
+              <th scope="col">Scenario</th>
+              <th scope="col">Recommended approach</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Server-rendered web app with Thymeleaf</td>
+              <td>Form login + sessions</td>
+            </tr>
+            <tr>
+              <td>REST API for React / Vue / Angular</td>
+              <td>JWT + stateless</td>
+            </tr>
+            <tr>
+              <td>"Login with Google"</td>
+              <td>OAuth2 Client</td>
+            </tr>
+            <tr>
+              <td>Enterprise SSO</td>
+              <td>OAuth2 / SAML</td>
+            </tr>
+            <tr>
+              <td>Microservices internal calls</td>
+              <td>Mutual TLS or API keys</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 10. CHEAT SHEET ============ -->
+  <section class="block-section" id="cheatsheet" aria-labelledby="cheatsheet-title">
+    <div class="container">
+      <p class="eyebrow" data-animate>Chapter 8 · Quick reference</p>
+      <h2 class="section-title" id="cheatsheet-title" data-animate>Quick Reference Cheat Sheet</h2>
+      <p class="section-lede" data-animate>
+        The four facts you will reach for most. Tap to expand.
+      </p>
+
+      <div class="acc-item" data-animate>
+        <h3>
+          <button class="acc-head" aria-expanded="false" aria-controls="acc-1">
+            Essential Annotations
+            <span class="acc-icon" aria-hidden="true"></span>
+          </button>
+        </h3>
+        <div class="acc-panel" id="acc-1">
+          <div class="acc-inner">
+            <p><code class="inline">@EnableWebSecurity</code> activates security configuration support.</p>
+            <p><code class="inline">@PreAuthorize</code> runs a SpEL rule at the method level — the most
+            expressive option for fine-grained checks.</p>
+            <p><code class="inline">@Secured</code> is the older, simpler method-level rule using plain
+            role names.</p>
+            <pre><code class="lang-java">@EnableWebSecurity                        // activates security config
+@PreAuthorize("hasRole('ADMIN')")         // method-level, most flexible
+@Secured("ADMIN")                         // method-level, simple &amp; legacy</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item" data-animate>
+        <h3>
+          <button class="acc-head" aria-expanded="false" aria-controls="acc-2">
+            Essential Classes
+            <span class="acc-icon" aria-hidden="true"></span>
+          </button>
+        </h3>
+        <div class="acc-panel" id="acc-2">
+          <div class="acc-inner">
+            <p><code class="inline">SecurityFilterChain</code> — the pipeline your requests flow through.
+            You build it with <code class="inline">HttpSecurity</code> and expose it as a bean.</p>
+            <p><code class="inline">HttpSecurity</code> — the fluent builder that assembles that pipeline.</p>
+            <p><code class="inline">AuthenticationManager</code> — verifies credentials by trying its
+            registered providers.</p>
+            <pre><code class="lang-java">SecurityFilterChain      // the pipeline requests flow through
+HttpSecurity             // builder that assembles that pipeline
+AuthenticationManager    // verifies credentials via providers</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item" data-animate>
+        <h3>
+          <button class="acc-head" aria-expanded="false" aria-controls="acc-3">
+            Status Codes — 401 vs 403
+            <span class="acc-icon" aria-hidden="true"></span>
+          </button>
+        </h3>
+        <div class="acc-panel" id="acc-3">
+          <div class="acc-inner">
+            <p><strong>401 Unauthorized</strong> — you are not authenticated. The app does not know who
+            you are. Fix: log in, or send a valid token.</p>
+            <p><strong>403 Forbidden</strong> — you are authenticated but not allowed to access this URL.
+            Fix: grant the right role or authority.</p>
+            <p><strong>200 OK</strong> — you passed the bouncer and reached the controller.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item" data-animate>
+        <h3>
+          <button class="acc-head" aria-expanded="false" aria-controls="acc-4">
+            PasswordEncoder Types
+            <span class="acc-icon" aria-hidden="true"></span>
+          </button>
+        </h3>
+        <div class="acc-panel" id="acc-4">
+          <div class="acc-inner">
+            <p><strong>BCrypt (recommended)</strong> — slow by design, salt built into the hash, the
+            de facto standard. Use it unless you have a strong reason not to.</p>
+            <p><strong>Argon2</strong> — memory-hard and modern, more tuning parameters, a great choice
+            for new high-security apps.</p>
+            <p><strong>PBKDF2</strong> — older and NIST-endorsed, built into the JDK, but weaker against
+            GPU-based attacks than the two above.</p>
+            <pre><code class="lang-java">// pick one and register it once as a bean
+@Bean
+public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 11. CALL-TO-ACTION BANNER ============ -->
+  <section class="cta-banner" aria-labelledby="cta-title">
+    <div class="container">
+      <div class="cta-inner" data-animate>
+        <h2 id="cta-title">Ready to secure your Spring Boot apps?</h2>
+        <p>
+          You now have the full mental model, the filter chain, the building blocks, and a working
+          example. The best next step is to open an editor and type it yourself.
+        </p>
+        <a class="btn btn-inverse" href="#example">Review the Full Example</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ 12. FOOTER ============ -->
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-col">
+      <h3>About this guide</h3>
+      <p>
+        A friendly, beginner-first walkthrough of Spring Security 6. No prior security knowledge
+        required — just Java, Spring Boot, and a willingness to meet the bouncer.
+      </p>
+    </div>
+    <div class="footer-col">
+      <h3>Quick links</h3>
+      <ul>
+        <li><a href="#what">What is Spring Security?</a></li>
+        <li><a href="#jobs">The Two Core Jobs</a></li>
+        <li><a href="#chain">The Filter Chain</a></li>
+        <li><a href="#blocks">Building Blocks</a></li>
+        <li><a href="#example">Complete Example</a></li>
+        <li><a href="#mistakes">Common Mistakes</a></li>
+        <li><a href="#decisions">When to Use What</a></li>
+        <li><a href="#cheatsheet">Cheat Sheet</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h3>Resources</h3>
+      <ul>
+        <li><a href="https://docs.spring.io/spring-security/reference/" target="_blank" rel="noopener noreferrer">Official Spring Security Reference</a></li>
+        <li><a href="https://start.spring.io/" target="_blank" rel="noopener noreferrer">Spring Initializr</a></li>
+        <li><a href="https://docs.spring.io/spring-security/site/docs/6.x/api/" target="_blank" rel="noopener noreferrer">Spring Security 6 API docs</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container">
+      <p>Built for beginners. No prior security knowledge required.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js" defer></script>
+</body>
+</html>
