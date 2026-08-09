@@ -5,9 +5,9 @@ An interactive, beginner-first tutorial that teaches **Spring Security 6** the w
 ![HTML](https://img.shields.io/badge/HTML-5-orange)
 ![CSS](https://img.shields.io/badge/CSS-3-blue)
 ![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-yellow)
-![License](https://img.shields.io/badge/License-MIT-green)
 
-> Add a `screenshot.png` to the repo root to show a live preview here.
+<img width="1705" height="977" alt="image" src="https://github.com/user-attachments/assets/a02d9131-b3cd-4b32-8780-9fe0b67848bf" />
+
 
 ## What you'll learn
 
@@ -31,41 +31,6 @@ An interactive, beginner-first tutorial that teaches **Spring Security 6** the w
 - **Fully accessible** — keyboard-navigable widgets, ARIA labels, `prefers-reduced-motion` support, skip link, semantic landmarks
 - **Zero dependencies** — no frameworks, no build step, no node_modules. Just three files.
 
-## Getting started
-
-The whole guide is static HTML — clone it and open it, or serve it locally:
-
-```bash
-# Option 1 — just open it
-open index.html
-
-# Option 2 — serve it (recommended; copy buttons work best over http)
-python3 -m http.server 8000
-# then visit http://localhost:8000
-```
-
-## Project structure
-
-```
-.
-├── index.html   # the entire guide, chapter by chapter
-├── style.css    # design tokens, layout, components, dark code blocks
-└── script.js    # syntax highlighter, copy buttons, stepper, TOC, "Try It" demo
-```
-
-## Customize it
-
-Want to make it yours? A few easy starting points:
-
-- **Colors** — every color on the page comes from four CSS custom properties at the top of `style.css` (`--bg`, `--surface`, `--accent`, `--ink`)
-- **Demo access rules** — the "Try It" bouncer's hardcoded rules live in `script.js` in the `checkPath()` function
-- **Demo users** — the `user` / `ROLE_USER` persona used by the simulator is described in the `#tryit` section of `index.html`
-
-## Built with
-
-- Semantic **HTML5** for structure and accessibility
-- Vanilla **CSS3** with custom properties, `clamp()`-based fluid type, and responsive layouts
-- Dependency-free **JavaScript (ES5-style, IIFE)** for all interactivity — works even with no bundler
 
 ## Contributing
 
